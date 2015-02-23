@@ -77,7 +77,7 @@ class CompileWidgetsetTask extends DefaultTask {
         def widgetsetCompileProcess = ['java']
 
         if (project.vaadin.gwt.jvmArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs
+            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs as List
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
@@ -104,6 +104,7 @@ class CompileWidgetsetTask extends DefaultTask {
 
         widgetsetCompileProcess += project.vaadin.widgetset
 
+        project.logger.info("about executing command:\n" + widgetsetCompileProcess.join(" "))
         def Process process = widgetsetCompileProcess.execute()
 
         Util.logProcess(project, process, 'widgetset-compile.log')
