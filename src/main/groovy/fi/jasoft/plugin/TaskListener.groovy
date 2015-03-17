@@ -186,7 +186,7 @@ public class TaskListener implements TaskExecutionListener {
         }
 
         if(task.getName() == BuildClassPathJar.NAME) {
-            def files = Util.getCompileClassPath(project).filter { File file ->
+            def files = Util.getClientCompilerClassPath(project).filter { File file ->
                 file.isFile() && file.name.endsWith('.jar')
             }
 
