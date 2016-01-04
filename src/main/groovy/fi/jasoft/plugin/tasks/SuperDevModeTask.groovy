@@ -20,7 +20,6 @@ import fi.jasoft.plugin.DependencyListener
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -36,18 +35,17 @@ class SuperDevModeTask extends DefaultTask {
         dependsOn(CompileWidgetsetTask.NAME)
         description = "Run Super Development Mode for easier client widget development."
 
-
-        addShutdownHook {
-           if(codeserverProcess){
-               codeserverProcess.destroy()
-               codeserverProcess = null
-           }
+        ResourceCleaner.onBuildFinished(project.gradle, {
+            if(codeserverProcess){
+                codeserverProcess.destroy()
+                codeserverProcess = null
+            }
 
             if(server) {
                 server.terminate()
                 server = null
             }
-        }
+        })
     }
 
     @TaskAction
@@ -104,3 +102,4 @@ class SuperDevModeTask extends DefaultTask {
         codeserverProcess.waitFor()
     }
 }
+

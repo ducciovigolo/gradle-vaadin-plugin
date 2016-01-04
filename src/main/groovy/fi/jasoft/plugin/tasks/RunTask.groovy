@@ -31,9 +31,9 @@ public class RunTask extends DefaultTask {
         dependsOn(CompileThemeTask.NAME)
         description = 'Runs the Vaadin application on an embedded Jetty ApplicationServer'
 
-        addShutdownHook {
+        ResourceCleaner.onBuildFinished(project.gradle, {
             server.terminate()
-        }
+        })
     }
 
     @TaskAction

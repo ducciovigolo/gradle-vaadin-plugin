@@ -35,7 +35,7 @@ class DevModeTask extends DefaultTask {
         dependsOn('classes', UpdateWidgetsetTask.NAME)
         description = "Run Development Mode for easier debugging and development of client widgets."
 
-        addShutdownHook {
+        ResourceCleaner.onBuildFinished(project.gradle, {
             if(devModeProcess) {
                 devModeProcess.destroy()
                 devModeProcess = null
@@ -44,7 +44,7 @@ class DevModeTask extends DefaultTask {
                 server.terminate()
                 server = null
             }
-        }
+        })
     }
 
     @TaskAction
