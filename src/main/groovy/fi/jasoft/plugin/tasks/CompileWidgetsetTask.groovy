@@ -18,8 +18,10 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.internal.tasks.compile.CompilationFailedException
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
+import org.gradle.tooling.BuildException
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -78,7 +80,9 @@ class CompileWidgetsetTask extends DefaultTask {
         def widgetsetCompileProcess = ['java']
 
         if (project.vaadin.gwt.jvmArgs) {
-            widgetsetCompileProcess += project.vaadin.gwt.jvmArgs
+            for (String arg : project.vaadin.gwt.jvmArgs) {
+                widgetsetCompileProcess += arg
+            }
         }
 
         widgetsetCompileProcess += ['-cp',  classpath.getAsPath()]
@@ -110,6 +114,10 @@ class CompileWidgetsetTask extends DefaultTask {
         Util.logProcess(project, process, 'widgetset-compile.log')
 
         process.waitFor()
+
+        if (process.exitValue() != 0) {
+            throw new CompilationFailedException(process.exitValue());
+        }
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
