@@ -18,8 +18,10 @@ package fi.jasoft.plugin.tasks
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.internal.tasks.compile.CompilationFailedException
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
+import org.gradle.tooling.BuildException
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -59,7 +61,8 @@ class CompileWidgetsetTask extends DefaultTask {
                     // Add GWT compiler + deps
                     if(file.name.startsWith('vaadin-client') ||
                             file.name.startsWith('vaadin-shared') ||
-                            file.name.startsWith('validation-api')){
+                            file.name.startsWith('validation-api') ||
+                            file.name.startsWith('gwt')){
                         return true
                     }
 
@@ -110,6 +113,10 @@ class CompileWidgetsetTask extends DefaultTask {
         Util.logProcess(project, process, 'widgetset-compile.log')
 
         process.waitFor()
+
+        if (process.exitValue() != 0) {
+            throw new CompilationFailedException(process.exitValue());
+        }
 
         /*
          * Compiler generates an extra WEB-INF folder into the widgetsets folder. Remove it.
