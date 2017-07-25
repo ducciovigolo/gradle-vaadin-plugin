@@ -12,7 +12,7 @@ class BuildClassPathJar extends Jar {
     BuildClassPathJar() {
         description = 'Creates a Jar with the project classpath'
         classifier = 'classpath'
-        dependsOn 'classes'
+        dependsOn 'compileJava'
 
         onlyIf {
             project.vaadin.plugin.useClassPathJar

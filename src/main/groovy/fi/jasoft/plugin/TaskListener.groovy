@@ -20,6 +20,7 @@ import fi.jasoft.plugin.tasks.BuildClassPathJar
 import fi.jasoft.plugin.tasks.CompileWidgetsetTask
 import fi.jasoft.plugin.tasks.CreateDirectoryZipTask
 import fi.jasoft.plugin.tasks.CreateWidgetsetGeneratorTask
+import fi.jasoft.plugin.tasks.UpdateAddonStylesTask
 import fi.jasoft.plugin.testbench.TestbenchHub
 import fi.jasoft.plugin.testbench.TestbenchNode
 import groovy.xml.MarkupBuilder
@@ -148,6 +149,16 @@ public class TaskListener implements TaskExecutionListener {
             configureAddonZipMetadata(task)
         }
 
+        if (task.getName() == CompileWidgetsetTask.NAME ||
+            task.getName() == UpdateAddonStylesTask.NAME) {
+
+            // Add classpath jar
+            if(project.vaadin.plugin.useClassPathJar) {
+                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+                task.inputs.file(pathJarTask.archivePath)
+            }
+        }
+
         if(task.getName() == CompileWidgetsetTask.NAME) {
             /* Monitor changes in dependencies since upgrading a
              * dependency should also trigger a recompile of the widgetset
@@ -166,12 +177,6 @@ public class TaskListener implements TaskExecutionListener {
             project.sourceSets.main.resources.srcDirs.each {
                 task.inputs.files(project.fileTree(it.absolutePath).include('**/*/public/**/*.*'))
                 task.inputs.files(project.fileTree(it.absolutePath).include('**/*/*.gwt.xml'))
-            }
-
-            // Add classpath jar
-            if(project.vaadin.plugin.useClassPathJar) {
-                BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
-                task.inputs.file(pathJarTask.archivePath)
             }
 
             File webAppDir = project.convention.getPlugin(WarPluginConvention).webAppDir

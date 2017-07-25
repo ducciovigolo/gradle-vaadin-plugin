@@ -27,6 +27,7 @@ class UpdateAddonStylesTask extends DefaultTask {
     public static final String NAME = 'vaadinUpdateAddonStyles'
 
     UpdateAddonStylesTask() {
+        dependsOn(BuildClassPathJar.NAME)
         description = 'Updates the addons.scss file with addon styles.'
     }
 
