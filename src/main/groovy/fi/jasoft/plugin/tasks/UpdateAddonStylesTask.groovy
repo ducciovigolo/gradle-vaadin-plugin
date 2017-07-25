@@ -17,6 +17,7 @@ package fi.jasoft.plugin.tasks
 
 import fi.jasoft.plugin.Util
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.WarPluginConvention
 import org.gradle.api.tasks.TaskAction
 
@@ -43,13 +44,22 @@ class UpdateAddonStylesTask extends DefaultTask {
             return;
         }
 
+        FileCollection classpathFileCollection
+
+        if(project.vaadin.plugin.useClassPathJar){
+            BuildClassPathJar pathJarTask = project.getTasksByName(BuildClassPathJar.NAME, true).first()
+            classpathFileCollection = project.files(pathJarTask.archivePath)
+        } else {
+            classpathFileCollection = Util.getCompileClassPath(project)
+        }
+
         themesDir.eachDir { dir ->
             project.logger.info("Updating ${dir.canonicalPath}/addons.scss")
 
             project.javaexec {
                 main 'com.vaadin.server.themeutils.SASSAddonImportFileCreator'
                 args dir.canonicalPath
-                classpath = Util.getCompileClassPath(project)
+                classpath = classpathFileCollection
             }
         }
     }
